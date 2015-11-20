@@ -16,13 +16,16 @@ typedef struct{
 }dados;
 
 typedef struct{
-	int vetor[4096];
+int *vetor;
+int tamanho;
 }memoria;
 
-void criarMem(memoria *m,int tamanho){
-	for(int i=1 ; i<=tamanho ; i++){
-		m->vetor[i]=0;
-	}
+memoria criarMemoria (int tamanho){
+	memoria m;
+	m.vetor = (int*) malloc (tamanho*sizeof(tamanho));
+	m.tamanho = tamanho;
+	memset ( m . vetor, 0, m.tamanho *sizeof(tamanho));
+	return m;
 }
 
 void criarProcesso(processo *p, int base, int limite, int id){
@@ -33,7 +36,8 @@ void criarProcesso(processo *p, int base, int limite, int id){
 }
 
 void apagar(processo *p){
-	free(p);
+	free (p);
+	p = NULL;
 }
 
 void escreverProcessMem(memoria *m, processo *p){
@@ -43,9 +47,9 @@ void escreverProcessMem(memoria *m, processo *p){
 }
 
 void guardarDados(memoria *m, processo *p, dados *d){
-	for(int i=1 ; i<=tamanho ; i++){
-		if(m->vetor[i]===p->ID){
-			for(int j=d->inicio ; j<=d->fim ; j++){
+	for(int i=1 ; i <= m->tamanho ; i++){
+		if(m->vetor[i] == p->ID){
+			for(int j=d->inicio ; j <= d->fim ; j++){
 				m->vetor[j]=d->conteudo;
 			}
 		}
@@ -57,4 +61,3 @@ void retirarProcessoMem(memoria *m, processo *p){
 		m->vetor[i]=0;
 	}
 }
-
