@@ -1,13 +1,13 @@
+// Etapa 3: João, Kauan e Larissa
+
 #include <bits/stdc++.h>
 
 using namespace std;
 
 typedef struct{
-	int tamanho;
-	int regBase;
-	int regLimite;
-	int ID;
-}processo;
+	int inicio;
+	int fim;
+}area;
 
 typedef struct{
 	int inicio;
@@ -16,16 +16,60 @@ typedef struct{
 }dados;
 
 typedef struct{
-int *vetor;
-int tamanho;
+	area espaco;
+	int id;
+}areaSobreposicao;
+
+typedef struct{
+	area Principal;
+	area Sobreposicao;
+}descricaoMemoria;
+
+typedef struct{
+	area principal;
+	areaSobreposicao sobreposicao;
+	int quantidadeSobreposicao;
+}descricaoProcesso;
+
+typedef struct{
+	int *vetor;
+	int tamanho;
+	descricaoMemoria *dMem;
 }memoria;
+
+typedef struct{
+	int tamanho;
+	int regBase;
+	int regLimite;
+	int ID;
+	descricaoProcesso *dProces;
+}processo;
+
+
+
+
 
 memoria criarMemoria (int tamanho){
 	memoria m;
-	m.vetor = (int*) malloc (tamanho*sizeof(tamanho));
+	m.vetor = (int*) malloc (tamanho* sizeof(tamanho));
 	m.tamanho = tamanho;
-	memset ( m . vetor, 0, m.tamanho *sizeof(tamanho));
-	return m;
+	memset ( m.vetor, 0, m.tamanho * sizeof(tamanho));
+return m;
+}
+
+void limparMem(memoria *m){
+	memset (m->vetor, 0, m->tamanho *sizeof(m->tamanho));
+}
+
+void inserir(int inicio, int fim, int dado, memoria *m){
+	for(int i=inicio ; i<=fim ; i++){
+	m->vetor[i]=dado;
+	}
+}
+
+void liberar(memoria *m){
+	free (m->vetor);
+	m->vetor = NULL;
 }
 
 void criarProcesso(processo *p, int base, int limite, int id){
@@ -60,4 +104,52 @@ void retirarProcessoMem(memoria *m, processo *p){
 	for(int i=p->regBase ; i<=p->regLimite ; i++){
 		m->vetor[i]=0;
 	}
+}
+
+descricaoMemoria *getDescricaoMemoria(memoria *m){
+	m->dMem=new descricaoMemoria();
+	return m->dMem;	
+}
+
+descricaoProcesso *getDescricaoProcesso(processo *p){
+	p->dProces=new descricaoProcesso();
+	return p->dProces;
+}
+
+bool alocarProcessoSimples(memoria *m, processo *p){
+	if(p->tamanho<=m->tamanho){
+		for(int i=p->regBase ; i<=p->regLimite ; i++){
+			m->vetor[i]=p->ID;
+		}
+		return true;
+	}else{
+		return false;
+	}
+}
+
+bool alocarProcessoSobreposicao (memoria *m, processo *p, int id){
+	for(int i=p->dProces->principal.inicio ; i<=p->dProces->principal.fim ; i++){
+		for(int j=m->dMem->Principal.inicio ; j<=p->dProces->principal.fim ; j++){
+			if(j>m->dMem->Principal.fim){
+				return false;
+			}else{
+				m->vetor[j]=p->ID;
+			}
+		}
+	}
+	for(int l=p->dProces->sobreposicao.espaco.inicio ; l<=p->dProces->sobreposicao.espaco.fim ; l++){
+		for(int k=m->dMem->Sobreposicao.inicio ; k<=p->dProces->principal.fim ; k++){
+			if(k>m->dMem->Sobreposicao.fim){
+				return false;
+			}else{
+				p->dProces->sobreposicao.id=id;
+				m->vetor[k]=p->dProces->sobreposicao.id;
+			}
+		}
+	}
+	return true;
+}
+bool trocarAreaSobreposicao(memoria *m, processo *p,int identificador){
+	if(identificador >= p->dProces->quantidadeSobreposicao) return false;
+	return alocarProcessoSobreposicao(m,p,identificador);
 }
