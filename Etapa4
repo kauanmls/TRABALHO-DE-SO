@@ -1,4 +1,4 @@
-// Etapa 3: João, Kauan e Larissa
+//4 -J oao, Kauan e Larissa.
 
 #include <bits/stdc++.h>
 
@@ -44,10 +44,6 @@ typedef struct{
 	int ID;
 	descricaoProcesso *dProces;
 }processo;
-
-
-
-
 
 memoria criarMemoria (int tamanho){
 	memoria m;
@@ -149,7 +145,62 @@ bool alocarProcessoSobreposicao (memoria *m, processo *p, int id){
 	}
 	return true;
 }
+
 bool trocarAreaSobreposicao(memoria *m, processo *p,int identificador){
 	if(identificador >= p->dProces->quantidadeSobreposicao) return false;
 	return alocarProcessoSobreposicao(m,p,identificador);
 }
+
+//PARTE 4(RASCUNHO):
+
+//1 - Alocamento partes iguais:
+//	Particionar memoria, alocar processo, remover processo, listar processo, espaço fragmentado.
+
+void particionarMemEst(memoria *m){
+	int part=m->tamanho/4;
+	int j=1;
+	for(int i=1 ; i<=m->tamanho ; i++){
+		m->vetor[i]=1;
+		j++;
+		if(j>part){
+			m->vetor[i]=2;
+		}
+		else if(j>2*part){
+			m->vetor[i]=3;
+		}
+		else if(j>3*part){
+			m->vetor[i]=4;
+		}
+	}	
+}
+
+bool alocarProcessoEst(processo *p, memoria *m);
+
+void removerProcessoEst(processo *p, memoria *m);
+
+processo listarProcessoEst(processo *p, memoria *m);
+
+memoria espacosFragmentadosEst(memoria *m);
+
+
+//2 - Alocamento partes dinâmicas:
+//	Alocar, remover, listar, espaço fragmentado. 
+
+bool alocarProcessoDin(processo *p, memoria *m){
+	p->ID=1;
+	if(p->tamanho<=m->tamanho){
+		for(int i=p->regBase ; i<=p->regLimite ; i++){
+			m->vetor[i]=p->ID;
+		}
+		
+		return true;
+	}else{
+		return false;
+	}
+}
+
+bool removerProcessoDin(processo *p, memoria *m);
+
+processo ListarProcessoDin(processo *p, memoria *m);
+	
+memoria espacoFragmentadoDin(memoria *m);
